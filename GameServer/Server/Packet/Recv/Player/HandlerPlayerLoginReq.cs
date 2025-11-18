@@ -19,6 +19,6 @@ public class HandlerPlayerLoginReq : Handler
         }
         
         await connection.Player.OnLogin();
-        await connection.SendPacket(new PacketPlayerLoginRsp(connection.Player));
+        await connection.SendPacket(new PacketPlayerLoginRsp(connection));
     }
 }

@@ -42,10 +42,9 @@ public class HandlerGetPlayerTokenReq : Handler
         await connection.Player.OnGetToken();
         connection.Player.Connection = connection;
 
-        await connection.SendPacket(new PacketGetPlayerTokenRsp(connection, req.AccountToken, req.KeyId));
+        // await connection.SendPacket(new PacketGetPlayerTokenRsp(connection, req.AccountToken, req.KeyId)); // TODO 加上判断
         
-        ulong randSeed = 1337;
-        await connection.SetSecretKey(randSeed);
+        connection.SecretKey = Crypto.GenerateSecretKey(1337);
         connection.State = SessionStateEnum.WAITING_FOR_LOGIN;
 
         // Only Game Version >= 2.7.50 has this
@@ -54,20 +53,20 @@ public class HandlerGetPlayerTokenReq : Handler
             try
             {
                 RSA signer = Crypto.SigningKey;
-
+        
                 byte[] client_seed_encrypted = Convert.FromBase64String(req.ClientRandKey);
                 byte[] client_seed = signer.Decrypt(client_seed_encrypted, RSAEncryptionPadding.Pkcs1);
-                byte[] encryptSeed = BitConverter.GetBytes(randSeed);
+                byte[] encryptSeed = BitConverter.GetBytes(connection.EncryptSeed);
                 Crypto.Xor(client_seed, encryptSeed);
                 byte[] seed_bytes = client_seed;
-
+        
                 //Kind of a hack, but whatever
                 RSA encryptor = Crypto.GetDispatchEncryptionKey((int)req.KeyId);
                 byte[] seed_encrypted = encryptor.Encrypt(seed_bytes, RSAEncryptionPadding.Pkcs1);
-
+        
                 byte[] seed_bytes_sign = signer.SignData(seed_bytes, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
-                await connection.SendPacket(new PacketGetPlayerTokenRsp(connection, randSeed, Convert.ToBase64String(seed_encrypted), Convert.ToBase64String(seed_bytes_sign), req.AccountToken));
+        
+                await connection.SendPacket(new PacketGetPlayerTokenRsp(connection, connection.EncryptSeed, Convert.ToBase64String(seed_encrypted), Convert.ToBase64String(seed_bytes_sign), req.AccountToken));
                 // Set session state
                 connection.UseSecretKey = true;
             }
@@ -75,12 +74,12 @@ public class HandlerGetPlayerTokenReq : Handler
             {
                 // Only UA Patch users will have exception
                 byte[] clientBytes = Convert.FromBase64String(req.ClientRandKey);
-                byte[] seed = BitConverter.GetBytes(randSeed);
+                byte[] seed = BitConverter.GetBytes(connection.EncryptSeed);
                 Crypto.Xor(clientBytes, seed);
-
+        
                 string base64str = Convert.ToBase64String(clientBytes);
-
-                await connection.SendPacket(new PacketGetPlayerTokenRsp(connection, randSeed, base64str, "bm90aGluZyBoZXJl", req.AccountToken));
+        
+                await connection.SendPacket(new PacketGetPlayerTokenRsp(connection, connection.EncryptSeed, base64str, "bm90aGluZyBoZXJl", req.AccountToken));
                 // Set session state
                 connection.UseSecretKey = true;
             }

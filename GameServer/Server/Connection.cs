@@ -204,20 +204,4 @@ public class Connection(KcpConversation conversation, IPEndPoint remote) : KcpCo
         // Send Rsp
         await SendPacket(respOpcode);
     }
-
-    public async Task SetSecretKey(ulong seed)
-    {
-        var mt = new MT19937(seed);
-        mt.Seed(mt.Int63());
-        mt.Int63();
-
-        await using var ms = new MemoryStream(0x1000);
-        using var bw = new BinaryWriter(ms);
-        for (int i = 0; i < 0x1000; i += 8)
-        {
-            bw.WriteUInt64BE(mt.Int63());
-        }
-
-        SecretKey = ms.ToArray();
-    }
 }

@@ -1,4 +1,4 @@
-﻿using NahidaImpact.Internationalization;
+using NahidaImpact.Internationalization;
 using NahidaImpact.KcpSharp.Base;
 using NahidaImpact.Util;
 using NahidaImpact.Util.Extensions;

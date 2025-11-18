@@ -1,0 +1,44 @@
+{
+  "HttpServer": {
+    "BindAddress": "0.0.0.0",
+    "PublicAddress": "127.0.0.1",
+    "Port": 2712
+  },
+  "GameServer": {
+    "BindAddress": "0.0.0.0",
+    "PublicAddress": "127.0.0.1",
+    "Port": 22102,
+    "KcpAliveMs": 30000,
+    "DatabaseName": "Nahida.db",
+    "GameServer": "NahidaImpact",
+    "GameServerName": "NahidaImpact"
+  },
+  "Path": {
+    "ResourcePath": "Resources",
+    "ConfigPath": "Config",
+    "DatabasePath": "Config/Database",
+    "HandbookPath": "Config/Handbook",
+    "LogPath": "Config/Logs",
+    "DataPath": "Config/Data"
+  },
+  "ServerOption": {
+    "Language": "CHS",
+    "DefaultPermissions": [
+      "Admin"
+    ],
+    "ServerProfile": {
+      "Name": "Ai-chan",
+      "Uid": 511694508,
+      "AvatarId": 1,
+      "DressId": 1
+    },
+    "AutoCreateUser": true,
+    "SavePersonalDebugFile": false,
+    "EnableDebug": true,
+    "DebugMessage": true,
+    "DebugDetailMessage": true,
+    "DebugNoHandlerPacket": true,
+    "IsServerStop": false,
+    "UseXorEncryption": true
+  }
+}

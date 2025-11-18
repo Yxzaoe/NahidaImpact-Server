@@ -13,8 +13,10 @@ public class PacketPlayerLoginRsp : BasePacket
     private static QueryCurrRegionHttpRsp RegionCache;
     private static Logger _logger;
     
-    public PacketPlayerLoginRsp(PlayerInstance player) : base(CmdIds.PlayerLoginRsp)
+    public PacketPlayerLoginRsp(Connection connection) : base(CmdIds.PlayerLoginRsp)
     {
+        connection.UseDispatchKey = true;
+        
         RegionInfo info;
         
         if (RegionCache == null)
@@ -45,7 +47,7 @@ public class PacketPlayerLoginRsp : BasePacket
         var proto = new PlayerLoginRsp
         {
             // IsUseAbilityHash = true,
-            AbilityHashCode = 1844674,
+            // AbilityHashCode = 1844674,
             GameBiz = "hk4e_global",
             ClientDataVersion = info.ClientDataVersion,
             ClientSilenceDataVersion = info.ClientSilenceDataVersion,

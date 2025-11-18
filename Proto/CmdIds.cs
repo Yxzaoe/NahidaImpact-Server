@@ -16,7 +16,7 @@ public class CmdIds
     public const int AvatarDataNotify = 71;
     public const int OpenStateUpdateNotify = 7518;
     public const int PlayerEnterSceneNotify = 5390;
-    public const int PlayerLoginRsp = 1548;
+    public const int PlayerLoginRsp = 5657;
 
     // Step 2
     public const int EnterSceneReadyReq = 27445;

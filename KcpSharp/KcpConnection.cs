@@ -33,11 +33,18 @@ public class KcpConnection
         Conversation = conversation;
         RemoteEndPoint = remote;
         CancelToken = new CancellationTokenSource();
+        this.SecretKey = new byte[4096];
+        EncryptSeed = Crypto.GenerateEncryptKeyAndSeed(SecretKey);
         Start();
     }
     
     public bool UseSecretKey { get; set; } = false;
-    public byte[]? SecretKey { get; set; }
+
+    public bool UseDispatchKey { get; set; } = false;
+    
+    public byte[]? SecretKey { get; set; } = Crypto.ENCRYPT_KEY;
+    
+    public ulong EncryptSeed { get; private set; } = Crypto.ENCRYPT_SEED;
 
     public long? ConversationId => Conversation.ConversationId;
 
@@ -121,7 +128,7 @@ public class KcpConnection
     {
         try
         {
-            Crypto.Xor(packet, UseSecretKey ? SecretKey : Crypto.DISPATCH_KEY);
+            Crypto.Xor(packet, UseDispatchKey? Crypto.DISPATCH_KEY : SecretKey);
             _ = await Conversation.SendAsync(packet, CancelToken.Token);
         }
         catch

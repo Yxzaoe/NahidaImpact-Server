@@ -14,6 +14,9 @@ public class Crypto
     public static byte[] DISPATCH_SEED { get; private set; } = Array.Empty<byte>();
     public static byte[] ENCRYPT_KEY { get; private set; } = Array.Empty<byte>();
     public static byte[] ENCRYPT_SEED_BUFFER { get; private set; } = Array.Empty<byte>();
+    
+    public static ulong ENCRYPT_SEED = ulong.Parse("11468049314633205968");
+    
     public static RSA? SigningKey { get; private set; }
     public static Dictionary<int, RSA> EncryptionKeys { get; } = new();
     
@@ -169,5 +172,21 @@ public class Crypto
         }
     
         return encryptSeed;
+    }
+    
+    public static byte[] GenerateSecretKey(ulong seed)
+    {
+        byte[] key = GC.AllocateUninitializedArray<byte>(0x1000);
+        Span<byte> keySpan = key.AsSpan();
+
+        MT19937 mt = new(seed);
+        mt.Int63();
+
+        for (int i = 0; i < 0x1000; i += 8)
+        {
+            BinaryPrimitives.WriteUInt64BigEndian(keySpan[i..], mt.Int63());
+        }
+
+        return key;
     }
 }

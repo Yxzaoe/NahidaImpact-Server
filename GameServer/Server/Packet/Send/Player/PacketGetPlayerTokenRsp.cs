@@ -10,6 +10,8 @@ public class PacketGetPlayerTokenRsp : BasePacket
 {
     public PacketGetPlayerTokenRsp(Connection connection, string token) :base(CmdIds.GetPlayerTokenRsp)
     {
+        connection.UseDispatchKey = true;
+        
         var proto = new GetPlayerTokenRsp
         {
             Uid = (uint)connection.Player.Uid,
@@ -26,6 +28,8 @@ public class PacketGetPlayerTokenRsp : BasePacket
     
     public PacketGetPlayerTokenRsp(Connection connection,string token, uint keyId) : base(CmdIds.GetPlayerTokenRsp)
     {
+        connection.UseDispatchKey = true;
+        
         var serverRandKey = "";
         var sign = "";
         if (ConfigManager.Config.ServerOption.UseXorEncryption) {
@@ -59,6 +63,8 @@ public class PacketGetPlayerTokenRsp : BasePacket
     
     public PacketGetPlayerTokenRsp(Connection connection, ulong secretKeySeed, string encryptedSeed, string encryptedSeedSign, string token) : base(CmdIds.GetPlayerTokenRsp)
     {
+        connection.UseDispatchKey = true;
+        
         GetPlayerTokenRsp proto = new GetPlayerTokenRsp()
         {
             Uid = (uint)connection.Player.Uid,
