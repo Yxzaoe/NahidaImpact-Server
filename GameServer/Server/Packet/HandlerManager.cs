@@ -4,28 +4,27 @@ namespace NahidaImpact.GameServer.Server.Packet;
 
 public static class HandlerManager
 {
-    public static Dictionary<int, Handler> handlers = [];
+    private static readonly Dictionary<int, Handler> Handlers = [];
 
     public static void Init()
     {
-        var classes = Assembly.GetExecutingAssembly().GetTypes(); // Get all classes in the assembly
-        foreach (var cls in classes)
+        foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
         {
-            var attribute = (Opcode?)Attribute.GetCustomAttribute(cls, typeof(Opcode));
+            if (!typeof(Handler).IsAssignableFrom(type) || type.IsAbstract) continue;
 
-            if (attribute != null) handlers.Add(attribute.CmdId, (Handler)Activator.CreateInstance(cls)!);
+            var attribute = type.GetCustomAttribute<Opcode>();
+            if (attribute == null) continue;
+
+            var handler = (Handler?)Activator.CreateInstance(type);
+            if (handler == null) continue;
+
+            Handlers[attribute.CmdId] = handler;
         }
     }
 
     public static Handler? GetHandler(int cmdId)
     {
-        try
-        {
-            return handlers[cmdId];
-        }
-        catch
-        {
-            return null;
-        }
+        Handlers.TryGetValue(cmdId, out var handler);
+        return handler;
     }
 }

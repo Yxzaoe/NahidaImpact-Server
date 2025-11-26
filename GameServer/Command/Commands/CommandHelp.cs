@@ -8,7 +8,7 @@ namespace NahidaImpact.GameServer.Command.Commands;
 public class CommandHelp : ICommands
 {
     [CommandDefault]
-    public async static ValueTask Help(CommandArg arg)
+    public static async ValueTask Help(CommandArg arg)
     {
         if (arg.Args.Count == 1)
         {

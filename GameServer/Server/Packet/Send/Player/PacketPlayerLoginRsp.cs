@@ -1,4 +1,5 @@
 using Google.Protobuf;
+using System;
 using NahidaImpact.GameServer.Game.Player;
 using NahidaImpact.KcpSharp;
 using NahidaImpact.Proto;
@@ -9,38 +10,35 @@ namespace NahidaImpact.GameServer.Server.Packet.Send.Player;
 
 public class PacketPlayerLoginRsp : BasePacket
 {
-    
-    private static QueryCurrRegionHttpRsp RegionCache;
-    private static Logger _logger;
+    private static readonly Logger Logger = new("PacketPlayerLoginRsp");
+    private static QueryCurrRegionHttpRsp? RegionCache;
     
     public PacketPlayerLoginRsp(Connection connection) : base(CmdIds.PlayerLoginRsp)
     {
-        RegionInfo info;
-        
         if (RegionCache == null)
         {
             try
             {
-                // todo: we might want to push custom config to client
-                RegionInfo serverRegion = new RegionInfo()
+                RegionInfo serverRegion = new()
                 {
                     GateserverIp = ConfigManager.Config.GameServer.PublicAddress,
                     GateserverPort = (uint)ConfigManager.Config.GameServer.Port,
                     SecretKey = ByteString.CopyFrom(Crypto.DISPATCH_SEED),
                     ResVersionConfig = new(),
                 };
-                RegionCache = new QueryCurrRegionHttpRsp()
+                RegionCache = new QueryCurrRegionHttpRsp
                 {
                     RegionInfo = serverRegion
                 };
             }
             catch (Exception e)
             {
-                _logger.Error("Error while initializing region cache!", e);
+                Logger.Error("Error while initializing region cache!", e);
+                throw;
             }
         }
         
-        info = RegionCache.RegionInfo;
+        var info = RegionCache.RegionInfo ?? throw new InvalidOperationException("Region info is not initialized.");
         
         var proto = new PlayerLoginRsp
         {

@@ -6,14 +6,15 @@ using NahidaImpact.GameServer.Game.Entity;
 using NahidaImpact.GameServer.Game.Player;
 using NahidaImpact.GameServer.Game.Player.Team;
 using NahidaImpact.GameServer.Server.Packet.Send.Avatar;
+using System.Linq;
 
 namespace NahidaImpact.GameServer.Game.Avatar;
 
 public class AvatarManager(PlayerInstance player) : BasePlayerManager(player)
 {
     public AvatarData AvatarData { get; } = DatabaseHelper.GetInstanceOrCreateNew<AvatarData>(player.Uid);
-    public List<GameAvatarTeam>? AvatarTeams { get; set; } = new();
-    public uint CurTeamIndex { get; set; }
+    public List<GameAvatarTeam> AvatarTeams { get; } = new();
+    public uint CurTeamIndex { get; private set; }
     public async ValueTask<AvatarDataExcel?> AddAvatar(int avatarId, int level = 90)
     {
         if (AvatarData.Avatars.Any(a => a.AvatarId == avatarId)) return null;
@@ -32,12 +33,19 @@ public class AvatarManager(PlayerInstance player) : BasePlayerManager(player)
             WearingFlycloakId = 340005
         };
         
-        AvatarTeams!.Add(new()
+        if (AvatarTeams.Count == 0)
         {
-            AvatarGuidList = new() { avatar!.Guid },
-            Index = 1
-        });
-        CurTeamIndex = 1;
+            AvatarTeams.Add(new GameAvatarTeam
+            {
+                AvatarGuidList = new() { avatar.Guid },
+                Index = 1
+            });
+            CurTeamIndex = 1;
+        }
+        else
+        {
+            AvatarTeams[0].AvatarGuidList.Add(avatar.Guid);
+        }
         
         avatar.InitDefaultProps(avatarExcel);
         AvatarData.Avatars.Add(avatar);
@@ -46,7 +54,21 @@ public class AvatarManager(PlayerInstance player) : BasePlayerManager(player)
     }
     
     public GameAvatarTeam GetCurrentTeam()
-        => AvatarTeams!.Find(team => team.Index == CurTeamIndex)!;
+    {
+        var team = AvatarTeams.FirstOrDefault(team => team.Index == CurTeamIndex);
+        if (team != null) return team;
+
+        if (AvatarTeams.Count == 0)
+        {
+            var fallback = new GameAvatarTeam { Index = 1 };
+            AvatarTeams.Add(fallback);
+            CurTeamIndex = fallback.Index;
+            return fallback;
+        }
+
+        CurTeamIndex = AvatarTeams[0].Index;
+        return AvatarTeams[0];
+    }
     
     public EntityAvatar CreateAvatar(PlayerInstance player, AvatarDataInfo avatarInfo)
     {

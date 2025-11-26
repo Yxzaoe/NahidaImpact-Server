@@ -22,14 +22,13 @@ public class Connection(KcpConversation conversation, IPEndPoint remote) : KcpCo
 
     ];
 
-    public override async void Start()
+    public override void Start()
     {
-        Logger.Info($"New connection from {RemoteEndPoint}.");
-        State = SessionStateEnum.WAITING_FOR_TOKEN;
-        await ReceiveLoop();
+        base.Start();
+        _ = ReceiveLoop();
     }
 
-    public override async void Stop(bool isServerStop = false)
+    public override void Stop(bool isServerStop = false)
     {
         //if (isServerStop) await Player!.SendPacket(new PacketPlayerKickOutScNotify(KickType.KickLoginWhiteTimeout));
         Player?.OnLogoutAsync();

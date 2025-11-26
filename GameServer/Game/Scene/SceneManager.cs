@@ -4,6 +4,7 @@ using NahidaImpact.GameServer.Game.Player;
 using NahidaImpact.GameServer.Game.Player.Team;
 using NahidaImpact.GameServer.Server.Packet.Send.Player;
 using NahidaImpact.GameServer.Server.Packet.Send.Scene;
+using System;
 
 namespace NahidaImpact.GameServer.Game.Scene;
 
@@ -23,22 +24,27 @@ public class SceneManager
         TeamAvatars = new();
     }
 
-    public async ValueTask EnterSceneAsync(uint sceneId)
+    public ValueTask EnterSceneAsync(uint sceneId)
     {
         if (BeginTime != 0) ResetState();
 
         BeginTime = (ulong)DateTimeOffset.Now.ToUnixTimeSeconds();
         SceneId = sceneId;
         EnterToken = ++EnterToken;
+        return ValueTask.CompletedTask;
     }
     
     public async ValueTask ChangeTeamAvatarsAsync(ulong[] guidList)
     {
         TeamAvatars.Clear();
 
+        var avatars = Player.Avatars ?? throw new InvalidOperationException("Player avatar list is not initialized.");
+
         foreach (ulong guid in guidList)
         {
-            AvatarDataInfo avatarInfo = Player.Avatars!.Find(avatar => avatar.Guid == guid)!; // currently only first one
+            var avatarInfo = avatars.Find(avatar => avatar.Guid == guid);
+            if (avatarInfo == null)
+                throw new InvalidOperationException($"Avatar with guid {guid} not found.");
 
             EntityAvatar entityAvatar = Player.AvatarManager!.CreateAvatar(Player, avatarInfo);
             entityAvatar.SetPosition(2336.789f, 249.98896f, -751.3081f);
@@ -53,10 +59,13 @@ public class SceneManager
     public async ValueTask OnSceneInitFinished()
     {
         GameAvatarTeam avatarTeam = Player.AvatarManager!.GetCurrentTeam();
+        var avatars = Player.Avatars ?? throw new InvalidOperationException("Player avatar list is not initialized.");
 
         foreach (ulong guid in avatarTeam.AvatarGuidList)
         {
-            AvatarDataInfo avatarInfo = Player.Avatars!.Find(avatar => avatar.Guid == guid)!;
+            var avatarInfo = avatars.Find(avatar => avatar.Guid == guid);
+            if (avatarInfo == null)
+                throw new InvalidOperationException($"Avatar with guid {guid} not found.");
 
             EntityAvatar entityAvatar = Player.AvatarManager!.CreateAvatar(Player, avatarInfo);
             if (Player.EntityAvatar == null)

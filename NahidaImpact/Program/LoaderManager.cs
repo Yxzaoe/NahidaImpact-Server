@@ -168,7 +168,7 @@ public class LoaderManager : NahidaImpact
             return;
         }
         IConsole.OnConsoleExcuteCommand += CommandExecutor.ConsoleExcuteCommand;
-        CommandExecutor.OnRunCommand += (sender, e) => { CommandManager.HandleCommand(e, sender); };
+        CommandExecutor.OnRunCommand += (sender, e) => { _ = CommandManager.HandleCommand(e, sender); };
 
         IConsole.ListenConsole();
     }

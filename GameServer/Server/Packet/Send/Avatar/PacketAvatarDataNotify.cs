@@ -17,7 +17,7 @@ public class PacketAvatarDataNotify : BasePacket
             AvatarList = { Avatars.Select(avatar => avatar.ToProto()) }
         };
         
-        foreach (GameAvatarTeam team in player.AvatarManager.AvatarTeams!)
+        foreach (GameAvatarTeam team in player.AvatarManager.AvatarTeams)
         {
             AvatarTeam avatarTeam = new();
             avatarTeam.AvatarGuidList.AddRange(team.AvatarGuidList);

@@ -14,6 +14,6 @@ public static class CommandExecutor
 
     public static void ConsoleExcuteCommand(string input)
     {
-        CommandManager.HandleCommand(input, new ConsoleCommandSender(CommandManager.Logger));
+        _ = CommandManager.HandleCommand(input, new ConsoleCommandSender(CommandManager.Logger));
     }
 }
