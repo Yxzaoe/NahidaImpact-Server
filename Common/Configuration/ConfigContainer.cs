@@ -6,6 +6,7 @@ public class ConfigContainer
     public GameServerConfig GameServer { get; set; } = new();
     public PathConfig Path { get; set; } = new();
     public ServerOption ServerOption { get; set; } = new();
+    public static ServerProfile ServerProfile { get; set; } = new();
 }
 
 public class HttpServerConfig
@@ -55,7 +56,6 @@ public class ServerOption
 {
     public string Language { get; set; } = "EN";
     public string[] DefaultPermissions { get; set; } = ["Admin"];
-    public ServerProfile ServerProfile { get; set; } = new();
     public bool AutoCreateUser { get; set; } = true;
     public bool SavePersonalDebugFile { get; set; } = false;
 #if DEBUG
@@ -68,12 +68,16 @@ public class ServerOption
     public bool DebugNoHandlerPacket { get; set; } = true;
     public bool IsServerStop { get; set; } = false;
     public bool UseXorEncryption { get; set; } = true;
+    
 }
 
 public class ServerProfile
 {
-    public string Name { get; set; } = "Ai-chan";
+    public string NickName { get; set; } = "Nahida";
+    public string Signature = "Welcome to NahidaServer!";
     public int Uid { get; set; } = 511694508;
-    public int AvatarId { get; set; } = 1;
-    public int DressId { get; set; } = 1;
+    public int AvatarId { get; set; } = 10000007;
+    public int NameCardId = 210001;
+    public int Level { get; set; } = 60;
+    public int WorldLevel = 9;
 }

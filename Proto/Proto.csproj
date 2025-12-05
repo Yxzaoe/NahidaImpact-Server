@@ -23,8 +23,4 @@
 	<Protobuf Include="./Protos/*.proto" ProtoRoot="./Protos" GrpcServices="None" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Ys\" />
-  </ItemGroup>
-
 </Project>
